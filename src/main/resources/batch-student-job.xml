@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+           
+       <job id="studentJob" xmlns="http://www.springframework.org/schema/batch">
+       		<!-- step1.处理 -->
+       		<step id="processStudent" next="transferFile">
+       			<tasklet>
+       				<chunk reader="studentReader" processor="studentProcessor" writer="studentWriter" commit-interval="1"/>
+       			</tasklet>
+       		</step>
+       		<!-- step2.转移处理好的文件 -->
+       		<step id="transferFile">
+       			<tasklet ref="transferFileTasklet"/>
+       		</step>
+       		<listeners>
+       			<listener ref="studentListener"/>
+       		</listeners>
+       </job>     
+</beans>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+                http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+
+	<bean id="studentReader" class="org.springframework.batch.item.file.MultiResourceItemReader" scope="step">
+		<property name="resources" value="#{jobParameters['filePath']}"></property>
+		<property name="delegate" ref="flatFileReader"></property>
+	</bean>
+	<bean id="flatFileReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="linesToSkip" value="1"></property>
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="delimiter" value=","></property>
+						<property name="names" value="a,b,c,d"></property>
+						<property name="includedFields" value="0,1,2,3"></property>
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean class="mapper.StudentMapper"></bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	<bean id="studentProcessor" class="processor.StudentProcessor"></bean>
+	<bean id="transferFileTasklet" class="tasklet.TransferFileTasklet" scope="step"></bean>
+	<bean id="studentWriter" class="writer.StudentWriter"></bean>
+	<bean id="studentListener" class="listener.StudentListener"></bean>
+
+</beans>
